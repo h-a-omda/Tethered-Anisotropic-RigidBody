@@ -1,2 +1,2 @@
-# Tethered-Nonholonomic-Dumbbell
+# Tethered-Nonholonomic-RigidBody
 Dynamics of a Tethered Nonholonomic Dumbbell System with Asymmetric Friction and Penalty Regularization
