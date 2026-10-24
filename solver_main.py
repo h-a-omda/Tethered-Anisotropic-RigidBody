@@ -16,7 +16,7 @@ b_perp = 50.0
 r_f = np.array([0.5, -0.5])
 
 
-k_spring = 200000.0
+k_spring = 1000000.0
 c_damper = 500.0
 
 
