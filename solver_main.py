@@ -3,13 +3,13 @@ import numpy as np
 from scipy.integrate import solve_ivp, cumulative_trapezoid
 
 
-m = 1.0  
-I = 0.5  
-L_tether = 3.0  
-anchor = np.array([0.0, 0.0])  
+m = 1.0
+I = 0.5
+L_tether = 3.0
+anchor = np.array([0.0, 0.0])
 
-b_parallel = 0.01  
-b_perp = 50.0  
+b_parallel = 0.01
+b_perp = 50.0
 
 
 r_f = np.array([0.5, -0.5])
@@ -33,27 +33,27 @@ def sleigh_physics(t, state):
 
   F_f_para = -b_parallel * np.dot(v_f, e_para) * e_para
   F_f_perp = -b_perp * np.dot(v_f, e_perp) * e_perp
-  F_friction = F_f_para + F_f_perp
+  F_drag = F_f_para + F_f_perp
 
-  tau_friction = rf_global[0] * F_friction[1] - rf_global[1] * F_friction[0]
+  tau_drag = rf_global[0] * F_drag[1] - rf_global[1] * F_drag[0]
 
-  
+
   r_vec = r_com - anchor
   r_dist = np.linalg.norm(r_vec)
   F_tension = np.array([0.0, 0.0])
 
   if r_dist > L_tether:
-    k_spring = 200000.0  
-    c_damper = 500.0  
+    k_spring = 200000.0
+    c_damper = 500.0
     r_unit = r_vec / r_dist
     r_dot = np.dot(v_com, r_unit)
     magnitude = k_spring * (r_dist - L_tether) + c_damper * max(0, r_dot)
     F_tension = -magnitude * r_unit
 
-  F_total = F_friction + F_tension
+  F_total = F_drag + F_tension
   ax = F_total[0] / m
   ay = F_total[1] / m
-  alpha = tau_friction / I
+  alpha = tau_drag / I
 
   return [Vx, Vy, Omega, ax, ay, alpha]
 
@@ -96,14 +96,14 @@ for i in range(len(t)):
 
   F_f_para = -b_parallel * np.dot(v_f, e_para) * e_para
   F_f_perp = -b_perp * np.dot(v_f, e_perp) * e_perp
-  F_friction = F_f_para + F_f_perp
-  tau_friction = rf_global[0] * F_friction[1] - rf_global[1] * F_friction[0]
+  F_drag = F_f_para + F_f_perp
+  tau_drag = rf_global[0] * F_drag[1] - rf_global[1] * F_drag[0]
 
-  
+
   r_vec = pos - anchor
   r_dist = np.linalg.norm(r_vec)
   if r_dist > L_tether:
-    k_spring = 200000.0
+    k_spring = 1000000.0
     c_damper = 500.0
     r_unit = r_vec / r_dist
     r_dot = np.dot(vel, r_unit)
@@ -111,11 +111,11 @@ for i in range(len(t)):
     force_magnitude[i] = mag
     V_spring[i] = 0.5 * k_spring * (r_dist - L_tether)**2
 
-  
-  power_dissipation[i] = np.dot(F_friction, vel) + tau_friction * om
+
+  power_dissipation[i] = np.dot(F_drag, vel) + tau_drag * om
 
 
-W_friction = cumulative_trapezoid(power_dissipation, t, initial=0)
+W_drag = cumulative_trapezoid(power_dissipation, t, initial=0)
 
 
 E_total = T_kinetic + V_spring
@@ -177,7 +177,7 @@ ax1.legend(loc='upper right', frameon=True, fontsize=9.0)
 ax2.plot(t, E_total, color='black', lw=1.5, label=r'$E_{\mathrm{total}}$')
 ax2.plot(t, T_kinetic, color='blue', lw=1.2, linestyle='--', label=r'$T_{\mathrm{kinetic}}$')
 ax2.plot(t, V_spring, color='red', lw=1.2, linestyle=':', label=r'$V_{\mathrm{spring}}$')
-ax2.plot(t, W_friction, color='green', lw=1.2, linestyle='-.', label=r'$W_{\mathrm{friction}}$')
+ax2.plot(t, W_drag, color='green', lw=1.2, linestyle='-.', label=r'$W_{\mathrm{drag}}$')
 ax2.set_xlabel('Time t [s]')
 ax2.set_ylabel('Energy / Work Ledger [J]')
 ax2.grid(True, linestyle=':', alpha=0.6)
@@ -195,15 +195,3 @@ max_penetration = np.max(r[r > L_tether] - L_tether)
 print(f"Maximum radial penetration: {max_penetration:.6f} m")
 
 force_magnitude = np.zeros_like(r)
-
-
-import time
-
-
-files.download('figure1_trajectory.pdf')
-time.sleep(1)
-files.download('figure2_tethersnap.pdf')
-time.sleep(1)
-files.download('figure3_phasespace.pdf')
-time.sleep(1)
-files.download('figure4_energyledger.pdf')
