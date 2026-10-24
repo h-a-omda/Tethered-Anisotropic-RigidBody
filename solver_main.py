@@ -47,17 +47,17 @@ def sleigh_physics(t, state):
 
     r_vec = r_com - anchor
     r_dist = np.linalg.norm(r_vec)
-    F_tension = np.array([0.0, 0.0])
+    F_tether = np.array([0.0, 0.0])
 
     if r_dist > L_tether:
         r_unit = r_vec / r_dist
         r_dot = np.dot(v_com, r_unit)
 
         magnitude = k_spring * (r_dist - L_tether) + c_damper * max(0, r_dot)
-        F_tension = -magnitude * r_unit
+        F_tether = -magnitude * r_unit
 
 
-    F_total = F_drag + F_tension
+    F_total = F_drag + F_tether
     ax = F_total[0] / m
     ay = F_total[1] / m
     alpha = tau_drag / I
@@ -149,7 +149,7 @@ ax1.set_ylabel('Radius r [m]')
 ax1.grid(True, linestyle=':', alpha=0.6)
 ax1.legend(loc='upper right', frameon=True)
 
-ax2.plot(t, force_magnitude, color='k', lw=1.0, label=r'Penalty Force Magnitude $|\mathbf{F}_{\mathrm{tension}}|$')
+ax2.plot(t, force_magnitude, color='k', lw=1.0, label=r'Penalty Force Magnitude $|\mathbf{F}_{\mathrm{tether}}|$')
 ax2.set_ylabel('Penalty Force [N]')
 ax2.set_xlabel('Time t [s]')
 ax2.grid(True, linestyle=':', alpha=0.6)
