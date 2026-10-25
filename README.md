@@ -1,2 +1,2 @@
 # Tethered-Anisotropic-RigidBody
-Dynamics of a Tethered Nonholonomic Dumbbell System with Asymmetric Friction and Penalty Regularization
+Dynamics of a Tethered Anisotropic Dissipative Rigid-Body System with Asymmetric Drag and Penalty Regularization
